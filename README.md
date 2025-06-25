@@ -17,13 +17,13 @@ A lightweight **Content Management System (CMS)** built using **React + Firebase
 ![Landing Page](./screenshots/LandingPage.png)
 
 ### 📝 Create Blog Page
-![Create Blog](./screenshots/create-blog.png)
+![Create Blog](./screenshots/CreateBlogPage.png)
 
 ### 📋 View All Blogs
-![View Blogs](./screenshots/view-blogs.png)
+![View Blogs](./screenshots/ViewBlogPage.png)
 
 ### 🖼️ View Uploaded Images
-![View Images](./screenshots/view-images.png)
+![View Images](./screenshots/ImageUploadPage.png)
 
 
 ---
