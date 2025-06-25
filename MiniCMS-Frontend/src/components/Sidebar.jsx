@@ -22,10 +22,9 @@ const features = [
 
   { icon: <FaPenNib />, title: "Artical Writing", link: "/create-post" },
   { icon: <FaFileAlt />, title: "Blogs writing", link: "/blog-creation" },
-  { icon: <FaImage />, title: "Image Uploads", link: "/media" },
-  { icon: <FaSearch />, title: "Search & Filter", link: "/search" },
-  { icon: <FaUserShield />, title: "Role-based Access", link: "/roles" },
-  { icon: <FaCloud />, title: "Firebase Integration", link: "/firebase" },
+  { icon: <FaImage />, title: "Image Uploads", link: "/image-upload" },
+  { icon: <FaSearch />, title: "Search & Filter", link: "/search-filter" },
+
 ];
 
 export default function Sidebar({ collapsed, setCollapsed }) {
