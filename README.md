@@ -54,5 +54,10 @@ A lightweight **Content Management System (CMS)** built using **React + Firebase
 
 ```bash
 git clone https://github.com/your-username/minicms.git
-cd minicms
+cd minicms-Frontend
 npm install
+npm run dev
+
+cd minicms-Backend
+npm install
+npm run dev
