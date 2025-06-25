@@ -20,8 +20,8 @@ import { useNavigate } from "react-router-dom";
 
 const features = [
 
-  { icon: <FaPenNib />, title: "Easy Post Creation", link: "/create-post" },
-  { icon: <FaFileAlt />, title: "Rich Text Editing", link: "/editor" },
+  { icon: <FaPenNib />, title: "Artical Writing", link: "/create-post" },
+  { icon: <FaFileAlt />, title: "Blogs writing", link: "/blog-creation" },
   { icon: <FaImage />, title: "Image Uploads", link: "/media" },
   { icon: <FaSearch />, title: "Search & Filter", link: "/search" },
   { icon: <FaUserShield />, title: "Role-based Access", link: "/roles" },
@@ -59,12 +59,14 @@ export default function Sidebar({ collapsed, setCollapsed }) {
         </div>
 
         <nav className="space-y-2">
-          <button
+          <Link
+            to="/home"
             className={`flex items-center p-2 rounded hover:bg-[#1f2937] transition ${location.pathname === "/home" ? "bg-[#1f2937]" : ""}`}
           >
             <FaHome className="text-lg mr-3" />
             {!collapsed && "Home"}
-          </button>
+          </Link>
+
 
           <div>
             <button
