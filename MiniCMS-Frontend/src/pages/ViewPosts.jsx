@@ -24,7 +24,7 @@ export default function ViewPosts() {
       });
 
       setPosts(postsData);
-    };
+    };  
 
     fetchPosts();
   }, []);
