@@ -1,27 +1,13 @@
-// // src/firebase.js
-// import { initializeApp } from "firebase/app";
-// import { getAuth } from "firebase/auth";
-// import { getFirestore } from "firebase/firestore";
-
-// const firebaseConfig = {
-//   apiKey: "YOUR_API_KEY",
-//   authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-//   projectId: "YOUR_PROJECT_ID",
-//   storageBucket: "YOUR_PROJECT_ID.appspot.com",
-//   messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-//   appId: "YOUR_APP_ID"
-// };
-
-// // Initialize Firebase
-// const app = initializeApp(firebaseConfig);
-
-// export const auth = getAuth(app);
-// export const db = getFirestore(app);
-
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  setPersistence,
+  browserLocalPersistence,
+} from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-// import { getAnalytics } from "firebase/analytics";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyBl1dCWiulmD9qL_UwWSCMchmKBtn_C_GI",
@@ -33,9 +19,33 @@ const firebaseConfig = {
   measurementId: "G-62LF2NPPT5"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
 
-// const analytics = getAnalytics(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
+
+// Sign in with Google popup method
+const signInWithGoogle = async () => {
+  try {
+    await setPersistence(auth, browserLocalPersistence);
+    const result = await signInWithPopup(auth, provider);
+    console.log("Google Sign-in Success:", result.user);
+    return result.user;
+  } catch (error) {
+    console.error("Google Sign-in Error:", error.code, error.message);
+    throw error;
+  }
+};
+
+const logout = async () => {
+  try {
+    await auth.signOut();
+    console.log("User signed out");
+  } catch (err) {
+    console.error("Sign out error:", err.message);
+  }
+};
+
+// ✅ Export all
+export { app, auth, db, provider, signInWithGoogle, logout };
