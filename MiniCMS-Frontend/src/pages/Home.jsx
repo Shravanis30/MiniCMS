@@ -273,9 +273,9 @@ export default function Home() {
                   </button>
                 </Link>
 
-                <Link to="/media">
+                <Link to="/blog-view">
                   <button className="bg-green-600 text-white p-4 rounded hover:bg-green-500 w-full">
-                    View Images
+                    view Blogs
                   </button>
                 </Link>
 
