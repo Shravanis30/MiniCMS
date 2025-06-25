@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { db } from "../firebase";
+import { db, auth } from "../firebase";
 import {
   collection,
   addDoc,
@@ -21,6 +21,7 @@ import {
   FaVideo,
   FaFont,
 } from "react-icons/fa";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function BlogCreation() {
   const [title, setTitle] = useState("");
@@ -29,46 +30,50 @@ export default function BlogCreation() {
   const [caption, setCaption] = useState("");
   const [image, setImage] = useState(null);
   const [video, setVideo] = useState(null);
-  const [author, setAuthor] = useState("");
-  const [authorImg, setAuthorImg] = useState("");
   const [language, setLanguage] = useState("English");
   const [saving, setSaving] = useState(false);
+  const [user, setUser] = useState(null);
   const editorRef = useRef(null);
   const navigate = useNavigate();
   const { id } = useParams();
   const location = useLocation();
   const existingPost = location.state;
 
-useEffect(() => {
-  const loadBlog = async () => {
-    if (existingPost) {
-      prefillFields(existingPost); // already passed via location.state
-    } else if (id) {
-      try {
-        const docRef = doc(db, "blogs", id); // using "blogs" collection
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          prefillFields({ id: docSnap.id, ...docSnap.data() });
-        } else {
-          alert("⚠️ No such blog found in Firestore.");
-        }
-      } catch (err) {
-        console.error("Error loading blog:", err);
+  useEffect(() => {
+    onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
       }
-    }
-  };
+    });
+  }, []);
 
-  loadBlog();
-}, [id]);
+  useEffect(() => {
+    const loadBlog = async () => {
+      if (existingPost) {
+        prefillFields(existingPost);
+      } else if (id) {
+        try {
+          const docRef = doc(db, "blogs", id);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            prefillFields({ id: docSnap.id, ...docSnap.data() });
+          } else {
+            alert("\u26A0\uFE0F No such blog found in Firestore.");
+          }
+        } catch (err) {
+          console.error("Error loading blog:", err);
+        }
+      }
+    };
 
+    loadBlog();
+  }, [id]);
 
   const prefillFields = (post) => {
     setTitle(post.title || "");
     setCategory(post.category || "Tech");
     setTags(post.tags?.join(", ") || "");
     setCaption(post.caption || "");
-    setAuthor(post.author || "");
-    setAuthorImg(post.authorImg || "");
     setLanguage(post.language || "English");
     setTimeout(() => {
       if (editorRef.current) editorRef.current.innerHTML = post.content || "";
@@ -78,52 +83,43 @@ useEffect(() => {
   const CLOUD_NAME = "dt5vmndd3";
   const UPLOAD_PRESET = "minicms_upload";
 
-  // IMAGE Upload
   const handleImageUpload = async () => {
     if (!image) return existingPost?.imageUrl || "";
     if (!(image instanceof File)) {
-      throw new Error("❌ Invalid image file");
+      throw new Error("\u274C Invalid image file");
     }
-
-
     try {
       const formData = new FormData();
       formData.append("file", image);
-      formData.append("upload_preset", "minicms_upload");
+      formData.append("upload_preset", UPLOAD_PRESET);
       const res = await axios.post(
-        "https://api.cloudinary.com/v1_1/dt5vmndd3/image/upload",
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
         formData
       );
-
       return res.data.secure_url;
     } catch (err) {
-      console.error("Cloudinary image upload failed:", err.response?.data || err.message);
-      alert("Image upload failed. Please check your Cloudinary preset or network.");
+      console.error("Image upload failed:", err);
+      alert("Image upload failed.");
       return null;
     }
   };
 
-
-  // VIDEO Upload
   const handleVideoUpload = async () => {
     if (!video) return existingPost?.videoUrl || "";
-
     const formData = new FormData();
     formData.append("file", video);
-    formData.append("upload_preset", "minicms_upload"); // or your video preset
-
+    formData.append("upload_preset", UPLOAD_PRESET);
     try {
       const res = await axios.post(
-        "https://api.cloudinary.com/v1_1/dt5vmndd3/video/upload",
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`,
         formData
       );
       return res.data.secure_url;
     } catch (err) {
-      console.error("Cloudinary video upload failed:", err.response || err);
-      throw new Error("Cloudinary video upload error");
+      console.error("Video upload failed:", err);
+      throw new Error("Video upload failed");
     }
   };
-
 
   const execCommand = (command, value = null) => {
     document.execCommand(command, false, value);
@@ -132,7 +128,7 @@ useEffect(() => {
   const insertVideo = () => {
     const url = prompt("Enter video URL");
     if (url) {
-      const videoHTML = `<video controls width="400"><source src="${url}" type="video/mp4">Your browser does not support the video tag.</video>`;
+      const videoHTML = `<video controls width="400"><source src="${url}" type="video/mp4"></video>`;
       execCommand("insertHTML", videoHTML);
     }
   };
@@ -151,8 +147,8 @@ useEffect(() => {
         caption: caption.trim(),
         imageUrl,
         videoUrl,
-        author: author.trim(),
-        authorImg: authorImg.trim(),
+        author: user?.displayName || "",
+        authorImg: user?.photoURL || "",
         language,
         content,
         status,
@@ -173,7 +169,7 @@ useEffect(() => {
           ...postData,
           createdAt: serverTimestamp(),
         });
-        alert("✅ Post published!");
+        alert("\u2705 Post published!");
         navigate(`/blog-creation/${docRef.id}`, {
           state: { ...postData, id: docRef.id },
         });
@@ -185,12 +181,11 @@ useEffect(() => {
     setSaving(false);
   };
 
-
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <main className="flex-1 p-6 overflow-y-auto bg-white">
-        <div className="max-w-5xl mx-auto p-6 bg-white shadow rounded mt-6">
+      <main className="flex-1 p-6 bg-gray-800 overflow-y-auto">
+        <div className="max-w-5xl mx-auto p-6 bg-gray-300 shadow rounded mt-6">
           <h2 className="text-3xl font-bold mb-6">
             {existingPost || id ? "Update Blog Post" : "Create New Blog Post"}
           </h2>
@@ -205,7 +200,7 @@ useEffect(() => {
               required
             />
 
-            <div className="flex gap-4">
+            <div className="flex flex-col md:flex-row gap-4">
               <select
                 className="p-2 border rounded"
                 value={category}
@@ -235,23 +230,6 @@ useEffect(() => {
               />
             </div>
 
-            <div className="flex gap-4">
-              <input
-                type="text"
-                placeholder="Author Name"
-                className="w-full p-2 border rounded"
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-              />
-              <input
-                type="text"
-                placeholder="Author Image URL"
-                className="w-full p-2 border rounded"
-                value={authorImg}
-                onChange={(e) => setAuthorImg(e.target.value)}
-              />
-            </div>
-
             <div>
               <label className="block font-medium mb-2">Content</label>
               <div className="flex flex-wrap gap-2 mb-2">
@@ -271,12 +249,12 @@ useEffect(() => {
               ></div>
             </div>
 
-            <div className="border p-4 rounded bg-gray-50">
+            <div className="border p-4 rounded bg-gray-250">
               <label className="block font-medium mb-2">Upload Image</label>
               <input
                 type="file"
                 onChange={(e) => setImage(e.target.files[0])}
-                className="mb-2"
+                className="p-1 mb-2 border bg-blue-200 rounded"
               />
               <input
                 type="text"
@@ -287,12 +265,12 @@ useEffect(() => {
               />
             </div>
 
-            <div className="border p-4 rounded bg-gray-50">
+            <div className="border p-4 rounded bg-gray-250">
               <label className="block font-medium mb-2">Upload Video</label>
               <input
                 type="file"
                 onChange={(e) => setVideo(e.target.files[0])}
-                className="mb-2"
+                className="p-1 mb-2 border bg-blue-200 rounded"
               />
             </div>
 

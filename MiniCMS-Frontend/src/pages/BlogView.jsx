@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../firebase";
 import Sidebar from "../components/Sidebar";
-import Modal from "../components/Modal";
 import { useNavigate } from "react-router-dom";
 
 export default function BlogView() {
@@ -24,20 +23,17 @@ export default function BlogView() {
   };
 
   const handleDelete = async (id) => {
-    const confirm = window.confirm("Are you sure you want to delete this post?");
-    if (!confirm) return;
-
+    if (!window.confirm("Are you sure you want to delete this post?")) return;
     try {
-      await deleteDoc(doc(db, "blogs", id)); // ✅ fixed to match collection
+      await deleteDoc(doc(db, "blogs", id));
       alert("Post deleted successfully");
       setSelectedPost(null);
-      fetchPosts(); // refresh list
+      fetchPosts();
     } catch (error) {
       console.error("Error deleting post:", error);
       alert("Failed to delete post.");
     }
   };
-
 
   const handleUpdate = (post) => {
     navigate(`/blog-creation/${post.id}`, { state: post });
@@ -46,25 +42,34 @@ export default function BlogView() {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <main className="flex-1 p-6 overflow-y-auto bg-gray-50">
-        <h2 className="text-3xl font-bold mb-6">All Blog Posts</h2>
+      <main className="flex-1 p-4 md:p-6 overflow-y-auto bg-gray-800">
+        <h2 className="text-3xl  text-gray-50 font-bold mb-6">All Blog Posts</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.map((post) => (
             <div
               key={post.id}
-              className="bg-white shadow rounded p-4 cursor-pointer hover:shadow-lg transition"
+              className="bg-gray-500 shadow rounded p-4 cursor-pointer hover:shadow-lg transition"
               onClick={() => setSelectedPost(post)}
             >
               {post.imageUrl && (
                 <img
                   src={post.imageUrl}
-                  alt="Post thumbnail"
+                  alt="Post"
                   className="w-full h-40 object-cover rounded mb-2"
                 />
               )}
-              <h3 className="text-xl font-semibold mb-1">{post.title}</h3>
-              <p className="text-sm text-gray-600">By {post.author}</p>
+              <h3 className="text-lg font-semibold mb-1">{post.title}</h3>
+              <div className="flex items-center gap-2 mb-1">
+                {post.authorImg && (
+                  <img
+                    src={post.authorImg}
+                    alt="Author"
+                    className="w-6 h-6 rounded-full object-cover"
+                  />
+                )}
+                <p className="text-sm text-gray-700">{post.author}</p>
+              </div>
               <p className="text-xs text-gray-500">
                 {post.category} • {post.language}
               </p>
@@ -77,16 +82,23 @@ export default function BlogView() {
         </div>
 
         {selectedPost && (
-          <Modal onClose={() => setSelectedPost(null)}>
-            <div className="p-4 max-w-3xl mx-auto">
-              <h2 className="text-2xl font-bold mb-2">{selectedPost.title}</h2>
+          <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/70 p-4">
+            <div className="bg-gray-300 w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-lg shadow-xl p-6 relative">
+              <button
+                onClick={() => setSelectedPost(null)}
+                className="absolute top-2 right-2 text-xl font-bold text-gray-600 hover:text-black"
+              >
+                ✕
+              </button>
+
+              <h2 className="text-2xl font-bold mb-4">{selectedPost.title}</h2>
 
               <div className="flex items-center gap-4 mb-4">
                 {selectedPost.authorImg && (
                   <img
                     src={selectedPost.authorImg}
                     alt="Author"
-                    className="w-10 h-10 rounded-full"
+                    className="w-10 h-10 rounded-full object-cover"
                   />
                 )}
                 <div>
@@ -101,12 +113,15 @@ export default function BlogView() {
                 <img
                   src={selectedPost.imageUrl}
                   alt="Post"
-                  className="w-full rounded mb-4"
+                  className="w-full h-auto rounded mb-4 object-contain max-h-72"
                 />
               )}
 
               {selectedPost.videoUrl && (
-                <video controls className="w-full rounded mb-4">
+                <video
+                  controls
+                  className="w-full max-h-72 object-contain rounded mb-4"
+                >
                   <source src={selectedPost.videoUrl} type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
@@ -119,11 +134,11 @@ export default function BlogView() {
               )}
 
               <div
-                className="prose max-w-none"
+                className="prose max-w-none text-sm"
                 dangerouslySetInnerHTML={{ __html: selectedPost.content }}
               ></div>
 
-              <div className="flex gap-4 mt-6">
+              <div className="flex flex-wrap gap-3 mt-6">
                 <button
                   onClick={() => handleUpdate(selectedPost)}
                   className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
@@ -144,7 +159,7 @@ export default function BlogView() {
                 </button>
               </div>
             </div>
-          </Modal>
+          </div>
         )}
       </main>
     </div>
