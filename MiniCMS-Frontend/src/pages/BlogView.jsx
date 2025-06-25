@@ -49,7 +49,7 @@ export default function BlogView() {
           {posts.map((post) => (
             <div
               key={post.id}
-              className="bg-gray-500 shadow rounded p-4 cursor-pointer hover:shadow-lg transition"
+              className="bg-gray-300 shadow rounded p-4 cursor-pointer hover:shadow-lg transition"
               onClick={() => setSelectedPost(post)}
             >
               {post.imageUrl && (
