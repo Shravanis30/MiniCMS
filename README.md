@@ -6,7 +6,7 @@ A lightweight **Content Management System (CMS)** built using **React + Firebase
 
 ## Live Demo
 
-🔗 [View Deployed Project]([https://your-demo-link.vercel.app](https://mini-cms-wefd.vercel.app/))  
+🔗 [View Deployed Project](https://mini-cms-wefd.vercel.app/)  
 
 ---
 
