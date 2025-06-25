@@ -14,7 +14,7 @@ A lightweight **Content Management System (CMS)** built using **React + Firebase
 ## 📸 Screenshots
 
 ### 🏠 Home Page with Recent Activity
-![Home Page](./screenshots/)
+![Landing Page](./screenshots/LandingPage.png)
 
 ### 📝 Create Blog Page
 ![Create Blog](./screenshots/create-blog.png)
