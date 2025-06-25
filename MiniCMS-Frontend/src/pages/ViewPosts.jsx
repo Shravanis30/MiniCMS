@@ -1,45 +1,64 @@
 import React, { useEffect, useState } from "react";
-import { collection, getDocs, query, orderBy } from "firebase/firestore";
-import { db, auth } from "../firebase";
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+import { db } from "../firebase";
 import Sidebar from "../components/Sidebar";
 import { formatDistanceToNow } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 export default function ViewPosts() {
   const [posts, setPosts] = useState([]);
   const [selectedPost, setSelectedPost] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
-      const querySnapshot = await getDocs(q);
-
-      const postsData = querySnapshot.docs.map((doc) => {
-        const data = doc.data();
-        const imageUrl = localStorage.getItem(`image-${data.id}`);
-        return {
-          id: doc.id,
-          ...data,
-          imageUrl,
-        };
-      });
-
-      setPosts(postsData);
-    };  
-
     fetchPosts();
   }, []);
+
+  const fetchPosts = async () => {
+    const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+    const querySnapshot = await getDocs(q);
+    const postsData = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setPosts(postsData);
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this post?")) return;
+    try {
+      await deleteDoc(doc(db, "posts", id));
+      alert("✅ Post deleted");
+      setSelectedPost(null);
+      fetchPosts();
+    } catch (err) {
+      console.error("Delete failed", err);
+      alert("❌ Failed to delete post.");
+    }
+  };
+
+  const handleUpdate = (post) => {
+    navigate(`/create-post/${post.id}`, { state: post });
+  };
 
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <main className="flex-1 p-6 bg-gray-100 overflow-y-auto">
-        <h1 className="text-3xl font-bold mb-6">All Posts</h1>
+      <main className="flex-1 p-6 bg-gray-800 overflow-y-auto">
+        <h1 className="text-3xl text-gray-50 font-bold mb-6">All Posts</h1>
 
         <div className="space-y-4">
           {posts.map((post) => (
             <div
               key={post.id}
-              className="flex items-start gap-4 bg-white shadow rounded p-4 hover:bg-gray-50 cursor-pointer"
+              className="flex items-start gap-4 bg-gray-300 shadow rounded p-4 hover:bg-gray-200 cursor-pointer"
               onClick={() => setSelectedPost(post)}
             >
               {post.imageUrl && (
@@ -52,7 +71,11 @@ export default function ViewPosts() {
               <div className="flex-1">
                 <h2 className="text-xl font-semibold">{post.title}</h2>
                 <p className="text-sm text-gray-500 mb-1">
-                  {post.category} • {formatDistanceToNow(new Date(post.createdAt?.seconds * 1000 || post.createdAt), { addSuffix: true })}
+                  {post.category} •{" "}
+                  {formatDistanceToNow(
+                    new Date(post.createdAt?.seconds * 1000 || post.createdAt),
+                    { addSuffix: true }
+                  )}
                 </p>
                 <p className="text-gray-700">
                   {post.content.length > 100
@@ -66,29 +89,117 @@ export default function ViewPosts() {
 
         {/* Modal */}
         {selectedPost && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white rounded p-6 max-w-2xl w-full relative shadow-xl">
+          <div className="fixed inset-0 bg-opacity-90 backdrop-blur-sm flex justify-center items-center z-50">
+            <div className="bg-gray-300 rounded-lg p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto relative shadow-lg">
               <button
                 onClick={() => setSelectedPost(null)}
-                className="absolute top-2 right-3 text-xl font-bold text-gray-600 hover:text-red-500"
+                className="absolute top-3 right-4 text-2xl font-bold text-gray-600 hover:text-red-600"
               >
                 &times;
               </button>
+
+              {/* Author Info Inside Modal */}
+              <div className="flex items-center gap-4 mb-4">
+                {selectedPost.authorImg && (
+                  <img
+                    src={selectedPost.authorImg}
+                    alt="Author"
+                    className="w-10 h-10 rounded-full"
+                  />
+                )}
+                <div>
+                  <p className="font-medium">{selectedPost.author}</p>
+                  <p className="text-sm text-gray-500">
+                    {selectedPost.category} •{" "}
+                    {formatDistanceToNow(
+                      new Date(
+                        selectedPost.createdAt?.seconds * 1000 ||
+                          selectedPost.createdAt
+                      ),
+                      { addSuffix: true }
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              {/* Image */}
               {selectedPost.imageUrl && (
                 <img
                   src={selectedPost.imageUrl}
                   alt=""
-                  className="w-full h-60 object-cover rounded mb-4"
+                  className="w-full max-h-64 object-contain rounded mb-4"
                 />
               )}
+
+              {/* Video */}
+              {selectedPost.videoUrl && (
+                <video controls className="w-full rounded mb-4 max-h-64 object-contain">
+                  <source src={selectedPost.videoUrl} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              )}
+
+              {/* Caption */}
+              {selectedPost.caption && (
+                <p className="italic text-sm text-gray-700 mb-3">
+                  {selectedPost.caption}
+                </p>
+              )}
+
+              {/* Title */}
               <h2 className="text-2xl font-bold mb-2">{selectedPost.title}</h2>
-              <p className="text-sm text-gray-500 mb-2">
-                {selectedPost.category} • {formatDistanceToNow(new Date(selectedPost.createdAt?.seconds * 1000 || selectedPost.createdAt), { addSuffix: true })}
-              </p>
-              <p className="mb-4">{selectedPost.content}</p>
-              <p className="text-sm italic text-gray-600">Tags: {selectedPost.tags?.join(", ")}</p>
-              <p className="text-sm mt-2 text-gray-500">Caption: {selectedPost.caption}</p>
+
+              {/* Content */}
+              <div
+                className="prose max-w-none text-gray-800"
+                dangerouslySetInnerHTML={{ __html: selectedPost.content }}
+              />
+
+              {/* Tags */}
+              {selectedPost.tags?.length > 0 && (
+                <p className="text-sm italic text-gray-600 mt-4">
+                  Tags: {selectedPost.tags.join(", ")}
+                </p>
+              )}
+
+              {/* Buttons */}
+              <div className="flex gap-4 mt-6">
+                <button
+                  onClick={() => handleUpdate(selectedPost)}
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(selectedPost.id)}
+                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                >
+                  Delete
+                </button>
+                <button
+                  onClick={() => setSelectedPost(null)}
+                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                >
+                  Close
+                </button>
+              </div>
             </div>
+          </div>
+        )}
+
+        {/* Fixed Author Info Outside Modal in Bottom Left */}
+        {selectedPost?.author && (
+          <div className="fixed bottom-6 left-6 z-50 bg-white shadow-lg px-4 py-2 rounded-full flex items-center gap-2 border border-gray-200">
+            {selectedPost.authorImg && (
+              <img
+                src={selectedPost.authorImg}
+                alt="Author"
+                className="w-8 h-8 rounded-full object-cover"
+              />
+            )}
+            <span className="text-sm font-medium text-gray-800">
+              {selectedPost.author}
+            </span>
           </div>
         )}
       </main>
