@@ -4,60 +4,87 @@ A lightweight **Content Management System (CMS)** built using **React + Firebase
 
 ---
 
-## Live Demo
+## 🌐 Live Demo
 
 🔗 [View Deployed Project](https://mini-cms-wefd.vercel.app/)  
+🔗 [GitHub Repository](https://github.com/Shravanis30/MiniCMS)
 
 ---
 
-## 📂 Features
+## 📸 Screenshots
 
-✅ Google Login (Firebase Authentication)  
-✅ Add / Edit / Delete Blog Posts  
-✅ View All Blogs with Pagination  
-✅ Search & Filter Posts by title/content/tags  
-✅ Create & View Images with Preview Modal  
-✅ Image Upload with Cloudinary Integration  
-✅ Author Name & Image auto-filled from Google Login  
-✅ Recent Activity Section on Home  
-✅ Responsive Design using Tailwind CSS  
-✅ Modal Preview with Transparent Blur Background  
-✅ Sidebar Navigation  
+### 🏠 Home Page with Recent Activity
+![Home Page](./screenshots/)
+
+### 📝 Create Blog Page
+![Create Blog](./screenshots/create-blog.png)
+
+### 📋 View All Blogs
+![View Blogs](./screenshots/view-blogs.png)
+
+### 🖼️ View Uploaded Images
+![View Images](./screenshots/view-images.png)
+
+
+---
+
+## ✨ Features
+
+- 🔐 **Google Login** with Firebase Authentication
+- 📝 **Create, Edit, and Delete** blog posts
+- 📄 **Pagination** for browsing blogs
+- 🔍 **Search & Filter** by title, tags, or content
+- 🌄 **Image Upload with Preview**
+- ☁️ **Image Hosting** via Cloudinary
+- 👤 **Auto-filled Author Info** (Google Name & Profile Pic)
+- 🕓 **Recent Activity Tracker**
+- 📱 **Responsive UI** using Tailwind CSS
+- 🧭 Sidebar navigation for all sections
+- 🎨 Beautiful layout with dark/light blend and transparency blur
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Area            | Tools Used                              |
-|------------------|------------------------------------------|
-| Frontend         | React.js, Vite                          |
-| Styling          | Tailwind CSS                            |
-| Routing          | React Router v6                         |
-| Auth             | Firebase Authentication (Google Login)  |
-| Database         | Firebase Firestore                      |
-| Image Hosting    | Cloudinary API                          |
-| Icons            | React Icons                             |
+| Feature        | Technology                                |
+|----------------|--------------------------------------------|
+| Frontend       | React.js, Vite                            |
+| Styling        | Tailwind CSS                              |
+| Routing        | React Router v6                           |
+| Auth           | Firebase Authentication (Google Login)    |
+| Database       | Firebase Firestore                        |
+| File Upload    | Cloudinary API                            |
+| Icons          | React Icons                               |
 
 ---
 
-## ⚙️ Setup Instructions
+## ⚙️ Getting Started
 
 ### 🔑 Prerequisites
 
 - Node.js & npm installed
-- Firebase project with Authentication and Firestore enabled
-- Cloudinary account for image uploads
+- Firebase Project with:
+  - Authentication (Google Sign-In) enabled
+  - Firestore Database enabled
+- Cloudinary account with upload preset
 
 ---
 
-### 📦 Installation
+### 📦 Installation Steps
 
 ```bash
-git clone https://github.com/your-username/minicms.git
-cd minicms-Frontend
+# Clone the repo
+git clone https://github.com/Shravanis30/MiniCMS.git
+cd MiniCMS
+
+# Install frontend dependencies
+cd MiniCMS-Frontend
 npm install
+
+# Start the frontend
 npm run dev
 
-cd minicms-Backend
+# Install backend 
+cd ../MiniCMS-Backend
 npm install
 npm run dev
