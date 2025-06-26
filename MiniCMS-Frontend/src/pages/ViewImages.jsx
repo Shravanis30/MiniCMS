@@ -1,77 +1,3 @@
-// import React, { useEffect, useState } from "react";
-// import { collection, getDocs, orderBy, query } from "firebase/firestore";
-// import { db } from "../firebase";
-// import Sidebar from "../components/Sidebar";
-// import { formatDistanceToNow } from "date-fns";
-
-// export default function ViewImages() {
-//   const [images, setImages] = useState([]);
-
-//   useEffect(() => {
-//     fetchImages();
-//   }, []);
-
-//   const fetchImages = async () => {
-//     const q = query(collection(db, "images"), orderBy("uploadedAt", "desc"));
-//     const snapshot = await getDocs(q);
-
-//     const data = snapshot.docs.map((doc) => ({
-//       id: doc.id,
-//       ...doc.data(),
-//     }));
-//     setImages(data);
-//   };
-
-//   return (
-//     <div className="flex min-h-screen">
-//       <Sidebar />
-//       <main className="flex-1 p-6 bg-gray-800 overflow-y-auto">
-//         <h2 className="text-3xl text-cyan-50 font-bold mb-6">Uploaded Images</h2>
-
-//         <div className="grid grid-cols-3 sm:grid-cols-1 gap-6">
-//           {images.map((img) => (
-//             <div
-//               key={img.id}
-//               className="bg-gray-500 shadow rounded-lg overflow-hidden relative group border"
-//             >
-//               {/* Author Info */}
-//               <div className="absolute top-2 left-2 bg-white/80 backdrop-blur px-2 py-1 rounded-md flex items-center gap-2 z-10">
-//                 {img.authorImg && (
-//                   <img
-//                     src={img.authorImg}
-//                     alt="Author"
-//                     className="w-6 h-6 rounded-full object-cover"
-//                   />
-//                 )}
-//                 <div className="text-xs">
-//                   <p className="font-semibold text-gray-800">{img.authorName}</p>
-//                   <p className="text-gray-500 text-[10px]">
-//                     {img.uploadedAt?.seconds &&
-//                       formatDistanceToNow(
-//                         new Date(img.uploadedAt.seconds * 1000),
-//                         { addSuffix: true }
-//                       )}
-//                   </p>
-//                 </div>
-//               </div>
-
-//               {/* Image (Full View with Object-Contain) */}
-//               <div className="w-full h-72 bg-white/20 backdrop-blur-sm flex items-center justify-center rounded">
-//                 <img
-//                   src={img.imageUrl}
-//                   alt="Uploaded"
-//                   className="max-h-full max-w-full object-contain"
-//                 />
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//       </main>
-//     </div>
-//   );
-// }
-
-
 import React, { useEffect, useState } from "react";
 import { collection, getDocs, orderBy, query, doc, deleteDoc } from "firebase/firestore";
 import { db } from "../firebase";
@@ -82,6 +8,8 @@ import { FaTrash } from "react-icons/fa";
 export default function ViewImages() {
   const [images, setImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [collapsed, setCollapsed] = useState(false);
+
 
   useEffect(() => {
     fetchImages();
@@ -112,11 +40,11 @@ export default function ViewImages() {
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
-      <main className="flex-1 p-6 bg-gray-800 overflow-y-auto">
+      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+      <main className="flex-1 px-4 py-6 sm:px-6 bg-gray-800 overflow-y-auto transition-all duration-300">
         <h2 className="text-3xl text-cyan-50 font-bold mb-6">Uploaded Images</h2>
 
-         <div className="grid grid-cols-3 sm:grid-cols-1 gap-6">
+        <div className="grid grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-6">
           {images.map((img) => (
             <div
               key={img.id}

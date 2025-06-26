@@ -1,4 +1,3 @@
-// Sidebar.jsx
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -43,9 +42,9 @@ export default function Sidebar({ collapsed, setCollapsed }) {
 
   return (
     <aside
-      className={`$ {
-        collapsed ? "w-20" : "w-64"
-      } bg-[#0b1120] text-white p-4 flex flex-col justify-between transition-all duration-300`}
+      className={`${collapsed ? "w-20" : "w-64"
+        } bg-[#0b1120] text-white p-4 flex flex-col justify-between transition-all duration-300`}
+
     >
       <div>
         <div className="flex items-center justify-between mb-8">

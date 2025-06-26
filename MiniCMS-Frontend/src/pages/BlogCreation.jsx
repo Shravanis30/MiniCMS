@@ -38,6 +38,8 @@ export default function BlogCreation() {
   const { id } = useParams();
   const location = useLocation();
   const existingPost = location.state;
+  const [collapsed, setCollapsed] = useState(false);
+
 
   useEffect(() => {
     onAuthStateChanged(auth, (currentUser) => {
@@ -183,10 +185,10 @@ export default function BlogCreation() {
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
-      <main className="flex-1 p-6 bg-gray-800 overflow-y-auto">
-        <div className="max-w-5xl mx-auto p-6 bg-gray-300 shadow rounded mt-6">
-          <h2 className="text-3xl font-bold mb-6">
+      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+      <main className={`flex-1 px-4 py-6 sm:px-6 bg-gray-800 overflow-y-auto transition-all duration-300 `}>
+        <div className="max-w-5xl mx-auto p-4 sm:p-6 bg-gray-300 shadow rounded mt-6">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">
             {existingPost || id ? "Update Blog Post" : "Create New Blog Post"}
           </h2>
 
@@ -194,7 +196,7 @@ export default function BlogCreation() {
             <input
               type="text"
               placeholder="Post Title"
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded text-sm sm:text-base"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
@@ -202,7 +204,7 @@ export default function BlogCreation() {
 
             <div className="flex flex-col md:flex-row gap-4">
               <select
-                className="p-2 border rounded"
+                className="p-2 border rounded text-sm sm:text-base flex-1"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
               >
@@ -212,7 +214,7 @@ export default function BlogCreation() {
               </select>
 
               <select
-                className="p-2 border rounded"
+                className="p-2 border rounded text-sm sm:text-base flex-1"
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
               >
@@ -224,7 +226,7 @@ export default function BlogCreation() {
               <input
                 type="text"
                 placeholder="Tags (comma-separated)"
-                className="w-full p-2 border rounded"
+                className="p-2 border rounded text-sm sm:text-base flex-1"
                 value={tags}
                 onChange={(e) => setTags(e.target.value)}
               />
@@ -245,7 +247,7 @@ export default function BlogCreation() {
               <div
                 ref={editorRef}
                 contentEditable
-                className="w-full p-4 border rounded min-h-[200px] focus:outline-none"
+                className="w-full p-4 border rounded min-h-[200px] bg-white focus:outline-none text-sm sm:text-base"
               ></div>
             </div>
 
@@ -254,12 +256,12 @@ export default function BlogCreation() {
               <input
                 type="file"
                 onChange={(e) => setImage(e.target.files[0])}
-                className="p-1 mb-2 border bg-blue-200 rounded"
+                className="p-1 mb-2 border bg-blue-200 rounded w-full"
               />
               <input
                 type="text"
                 placeholder="Caption"
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded text-sm sm:text-base"
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
               />
@@ -270,16 +272,16 @@ export default function BlogCreation() {
               <input
                 type="file"
                 onChange={(e) => setVideo(e.target.files[0])}
-                className="p-1 mb-2 border bg-blue-200 rounded"
+                className="p-1 mb-2 border bg-blue-200 rounded w-full"
               />
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               <button
                 type="button"
                 onClick={() => handleSubmit("draft")}
                 disabled={saving}
-                className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+                className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 w-full sm:w-auto"
               >
                 Save as Draft
               </button>
@@ -287,7 +289,7 @@ export default function BlogCreation() {
                 type="button"
                 onClick={() => handleSubmit("published")}
                 disabled={saving}
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full sm:w-auto"
               >
                 {existingPost || id ? "Update Post" : "Publish Post"}
               </button>
@@ -297,4 +299,5 @@ export default function BlogCreation() {
       </main>
     </div>
   );
+
 }

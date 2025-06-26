@@ -10,6 +10,7 @@ export default function ImageUpload() {
   const [previewUrl, setPreviewUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState({ name: "", photo: "" });
+  const [collapsed, setCollapsed] = useState(false);
 
   const CLOUD_NAME = "dt5vmndd3";
   const UPLOAD_PRESET = "minicms_upload";
@@ -67,30 +68,34 @@ export default function ImageUpload() {
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
-      <main className="flex-1 p-6 bg-gray-800 overflow-y-auto">
-        <div className="max-w-2xl mx-auto bg-gray-300 p-6 rounded shadow">
-          <h2 className="text-2xl font-bold mb-4">Upload Image</h2>
-          <input type="file" 
-          onChange={handleFileChange}                 
-          className="p-1 mb-2 border bg-blue-200 rounded"
-         />
+      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+      <main className="flex-1 px-4 py-6 sm:px-6 bg-gray-800 overflow-y-auto transition-all duration-300">
+        <div className="max-w-2xl mx-auto bg-gray-300 p-4 sm:p-6 rounded shadow">
+          <h2 className="text-xl sm:text-2xl font-bold mb-4">Upload Image</h2>
 
-          {previewUrl && (
-            <img
-              src={previewUrl}
-              alt="Preview"
-              className="w-full max-h-64 object-contain rounded mb-4"
+          <div className="flex flex-col gap-4">
+            <input
+              type="file"
+              onChange={handleFileChange}
+              className="p-2 border bg-blue-200 rounded w-full text-sm sm:text-base"
             />
-          )}
 
-          <button
-            onClick={handleUpload}
-            disabled={loading}
-            className="bg-blue-600 text-white m-2 px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-          >
-            {loading ? "Uploading..." : "Upload Image"}
-          </button>
+            {previewUrl && (
+              <img
+                src={previewUrl}
+                alt="Preview"
+                className="w-full max-h-[300px] object-contain rounded"
+              />
+            )}
+
+            <button
+              onClick={handleUpload}
+              disabled={loading}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 w-full sm:w-auto"
+            >
+              {loading ? "Uploading..." : "Upload Image"}
+            </button>
+          </div>
         </div>
       </main>
     </div>

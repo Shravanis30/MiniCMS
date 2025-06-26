@@ -8,6 +8,8 @@ export default function BlogView() {
   const [posts, setPosts] = useState([]);
   const [selectedPost, setSelectedPost] = useState(null);
   const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState(false);
+  
 
   useEffect(() => {
     fetchPosts();
@@ -41,8 +43,8 @@ export default function BlogView() {
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
-      <main className="flex-1 p-4 md:p-6 overflow-y-auto bg-gray-800">
+      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+      <main className="flex-1 px-4 py-4 sm:px-6 sm:py-6 bg-gray-800 overflow-y-auto transition-all duration-300">
         <h2 className="text-3xl  text-gray-50 font-bold mb-6">All Blog Posts</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
